@@ -31,30 +31,25 @@ jobs:
           required "${{ steps.config.outputs.output_type }}" "OUTPUT_TYPE config"
       - name: Setup ErfanGSIs Tools
         run: |
-          git clone --recurse-submodules "${{ steps.config.outputs.tool_repo }}"
-          bash ErfanGSIs-VelanGSIs/setup.sh
-          sed -i '$d' ErfanGSIs-VelanGSIs/url2GSI.sh
+          git clone --recurse-submodules "${{ steps.config.outputs.tool_repo }}" ErfanGSIs
+          bash ErfanGSIs/setup.sh
+          sed -i '$d' ErfanGSIs/url2GSI.sh
       - name: Build A/B
         if: ${{ steps.config.outputs.output_type == 'all' }}
         run: |
-          sudo ./ErfanGSIs-VelanGSIs/url2GSI.sh "${{ steps.config.outputs.url }}" "${{ steps.config.outputs.firmware_type }}" "${{ steps.config.outputs.extra_args }}"
+          sudo ./ErfanGSIs/url2GSI.sh "${{ steps.config.outputs.url }}" "${{ steps.config.outputs.firmware_type }}" "${{ steps.config.outputs.extra_args }}"
       - name: Build AB
         if: ${{ steps.config.outputs.output_type == 'ab' }}
         run: |
-          sudo ./ErfanGSIs-VelanGSIs/url2GSI.sh "${{ steps.config.outputs.url }}" "${{ steps.config.outputs.firmware_type }}" --ab ${{ steps.config.outputs.extra_args }}
+          sudo ./ErfanGSIs/url2GSI.sh "${{ steps.config.outputs.url }}" "${{ steps.config.outputs.firmware_type }}" --ab ${{ steps.config.outputs.extra_args }}
       - name: Build AOnly
         if: ${{ steps.config.outputs.output_type == 'a' }}
         run: |
-          sudo ./ErfanGSIs-VelanGSIs/url2GSI.sh "${{ steps.config.outputs.url }}" "${{ steps.config.outputs.firmware_type }}" --aonly ${{ steps.config.outputs.extra_args }}
-      - name: Setup SSH
-        uses: fastai/workflows/ssh@master
-        with:
-          ssh_key: ${{ secrets.SSH_KEY }}
-          key_file: id_ecdsa
-      - name: Upload
-        run: |
-          ssh-keyscan frs.sourceforge.net >> ~/.ssh/known_hosts
-          sshpass -p "${{ secrets.PASSWORD }}" rsync -e ssh /home/runner/work/GSI-Workshop/GSI-Workshop/ErfanGSIs-VelanGSIs/output/*.zip "${{ secrets.USERNAME }}@frs.sourceforge.net:${{ steps.config.outputs.sourceforge_dir }}"
+          sudo ./ErfanGSIs/url2GSI.sh "${{ steps.config.outputs.url }}" "${{ steps.config.outputs.firmware_type }}" --aonly ${{ steps.config.outputs.extra_args }}
+      - name: Zip Aonly and upload 
+        run: | 
+              sudo chmod 777 /home/runner/work/OEM-GSI-Builder/OEM-GSI-Builder/ErfanGSIs/output
+              curl --upload-file  /home/runner/work/OEM-GSI-Builder/OEM-GSI-Builder/ErfanGSIs/output/*.img https://transfer.sh/funtouchosvivou10ab.img
       - name: Telegram Notify
         if: ${{ steps.config.outputs.tg_chat_ids != 0 }}
         run: |
