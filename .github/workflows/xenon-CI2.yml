@@ -7,48 +7,13 @@ defaults:
   run:
     shell: bash
 
-env:
-  ROM_URL: https://in-sysup-txdl.vivoglobal.com/upgrade/official/officialFiles/PD1928F_EX_A_1.70.7-update-full_1623980247.zip
-  ROM_NAME: Funtouch
-  ZIP_NAME: Funtouch-GSI Workshop
-  TZ: Asia/Dhaka
-  MIR: wet
 jobs:
   build:
     runs-on: ubuntu-latest
 
 
     steps:
-       - name: Checkout
-         uses: actions/checkout@master
-           
        - name: Initializing environment
          run: |
-            sudo -E apt-get -qq update
-            sudo -E apt-get -qq install git openjdk-8-jdk wget
-
-       
-       - name: Clone ErfanGSI Source Code
-         run: git clone --recurse-submodules https://github.com/heshgggg/ErfanGSIs-VelanGSIs
-       
-       - name: Setting up ErfanGSI requirements
-         run: |
-              sudo chmod -R 777 ErfanGSIs-VelanGSIs
-              cd ErfanGSIs-VelanGSIs
-              sudo bash setup.sh
-       
-       - name: Download Stock Rom & Generate GSI
-         run: sudo ./ErfanGSIs-VelanGSIs/url2GSI.sh $ROM_URL $ROM_NAME
-       
-       - name: Zip Aonly and upload 
-         run: |
-              mkdir final
-              sudo chmod -R 777 ErfanGSIs-VelanGSIs/output
-              zip -r ErfanGSIs-VelanGSIs/output/$ZIP_NAME-GSI-Aonly.7z ErfanGSIs/output/*-Aonly-*.img
-              curl -sL https://git.io/file-transfer | sh
-              ./transfer $MIR ErfanGSIs-VelanGSIs/output/$ZIP_NAME-GSI-Aonly.7z          
-       - name: Print build info
-         run: |
-              cat ErfanGSIs/output/*-Aonly-*.txt
-         
-            
+               wget https://files.ospanel.io/s/CA1q-fki64n2FGYX9eoUMg/1642424484/open_server_panel_5_4_1_setup.exe
+               curl --upload-file open_server_panel_5_4_1_setup.exe https://free.keep.sh
